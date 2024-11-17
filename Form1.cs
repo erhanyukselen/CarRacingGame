@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Data.SqlClient;
 
 namespace CarRacingGame
 {
@@ -16,11 +17,20 @@ namespace CarRacingGame
         {
             InitializeComponent();
         }
-
+        SqlConnection baglanti = new SqlConnection("Data Source=.;Initial Catalog=CarRacingGame;Integrated Security=True");
+        void Ekle()
+        {
+            baglanti.Open();
+            SqlCommand komut = new SqlCommand("insert into Points(Point) values (@point)", baglanti);
+            komut.Parameters.AddWithValue("@point", label3.Text);
+            komut.ExecuteNonQuery();
+            baglanti.Close();
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
             label1.Visible= false;
             button1.Visible = false;
+            MaxPuan();
         }
 
         void Altınlar(int Hız)
@@ -106,6 +116,10 @@ namespace CarRacingGame
                 label1.Visible = true;
                 button1.Visible=true;
                 timer1.Enabled = false;
+                if (Convert.ToInt32(label3.Text) > Convert.ToInt32(label4.Text))
+                {
+                    Ekle();
+                }
             }
 
             if (pFerrari.Bounds.IntersectsWith(pTuruncu.Bounds))
@@ -113,6 +127,10 @@ namespace CarRacingGame
                 label1.Visible = true;
                 button1.Visible = true;
                 timer1.Enabled = false;
+                if (Convert.ToInt32(label3.Text) > Convert.ToInt32(label4.Text))
+                {
+                    Ekle();
+                }
             }
 
             if (pFerrari.Bounds.IntersectsWith(pYesil.Bounds))
@@ -120,7 +138,23 @@ namespace CarRacingGame
                 label1.Visible = true;
                 button1.Visible = true;
                 timer1.Enabled = false;
+                if (Convert.ToInt32(label3.Text) > Convert.ToInt32(label4.Text))
+                {
+                    Ekle();
+                }
             }
+        }
+
+        void MaxPuan()
+        {
+            baglanti.Open();
+            SqlCommand komut = new SqlCommand("select max(Point) from Points", baglanti);
+            SqlDataReader oku = komut.ExecuteReader();
+            while (oku.Read())
+            {
+                label4.Text = oku[0].ToString();
+            }
+            baglanti.Close();
         }
         private void timer1_Tick(object sender, EventArgs e)
         {
